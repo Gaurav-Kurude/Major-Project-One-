@@ -1,12 +1,13 @@
 require("dotenv").config();
 const {initializeDatabase} = require("./db/db.connect");
 const Products = require("./models/shopping.models");
+const Orders = require("./models/order.models");
 const express = require("express");
+const cors = require("cors");
 const app = express();
 app.use(express.json());
 initializeDatabase();
 
-const cors = require("cors");
 const corsOptions = {
   origin: "*",
   credentials: true,
@@ -110,6 +111,35 @@ app.get("/categories/:categoryId", async (req, res) => {
         res.status(500).json({error: "Failed to fetch category."})
     }
 })
+
+app.post("/orders", async (req, res) => {
+  try {
+    const {
+      products,
+      address,
+      totalPrice,
+    } = req.body;
+
+    const newOrder = new Orders({
+      products,
+      address,
+      totalPrice,
+    });
+
+    const savedOrder = await newOrder.save();
+
+    res.status(201).json({
+      message: "Order placed successfully",
+      order: savedOrder,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      error: "Failed to place order",
+    });
+  }
+});
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, ()=> {
