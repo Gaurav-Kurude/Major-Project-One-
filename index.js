@@ -112,6 +112,27 @@ app.get("/categories/:categoryId", async (req, res) => {
     }
 })
 
+// To add new data in to DB from Postman body.
+async function createProduct(newProduct){
+    try{
+       const product = new Products(newProduct);
+       const saveProduct = await product.save();
+       return saveProduct;
+    } catch(error){
+        throw error
+    }
+}
+
+app.post("/products", async (req, res)=>{
+    try{
+        const saveProduct = await createProduct(req.body)
+        res.status(201).json({message: "Product Added Successfully.", product: saveProduct});
+    } catch(error){
+        console.log(error);
+        res.status(500).json({error: "Failed to add product"});
+    }
+})
+
 app.post("/orders", async (req, res) => {
   try {
     const {
