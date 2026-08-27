@@ -6,7 +6,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(express.json());
-initializeDatabase();
+// initializeDatabase();
 
 const corsOptions = {
   origin: "*",
@@ -197,6 +197,16 @@ app.delete("/orders/:id", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log("Server is running on port", PORT);
-});
+async function startServer() {
+  try {
+    await initializeDatabase();
+
+    app.listen(PORT, () => {
+      console.log("Server is running on port", PORT);
+    });
+  } catch (error) {
+    console.log("Server could not start because MongoDB connection failed.");
+  }
+}
+
+startServer();
